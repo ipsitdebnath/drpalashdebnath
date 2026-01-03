@@ -1,0 +1,265 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(120deg, #eef4ff, #f9fbff);
+    color: #222;
+}
+
+/* Header */
+header {
+    background: #0d6efd;
+    color: white;
+    text-align: center;
+    padding: 28px 16px;
+}
+
+header h1 {
+    font-size: 24px;
+}
+
+header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Layout */
+.container {
+    max-width: 1200px;
+    margin: 36px auto;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 28px;
+}
+
+/* Card */
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    color: #0d6efd;
+    margin-bottom: 16px;
+    font-size: 20px;
+}
+
+/* Form */
+.input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+input {
+    width: 100%;
+    padding: 11px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Slots */
+.slot-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.slot-section {
+    margin-bottom: 14px;
+}
+
+.slot-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0d6efd;
+    margin-bottom: 6px;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.slot {
+    padding: 6px 4px;
+    border-radius: 6px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.slot.available {
+    background: #eefaf1;
+    color: #1b7a3a;
+}
+
+.slot.booked {
+    background: #f2f2f2;
+    color: #999;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.slot.selected {
+    background: #0d6efd;
+    color: white;
+}
+
+/* Scheduled Appointments */
+.schedule-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 8px;
+}
+
+th {
+    background: #f3f6ff;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+td {
+    vertical-align: top;
+}
+
+/* Appointment card */
+td div {
+    background: #eef3ff;
+    padding: 6px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    line-height: 1.25;
+}
+
+td div strong {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1f6fff;
+    margin-bottom: 2px;
+}
+
+.patient-name {
+    font-weight: 500;
+    color: #222;
+}
+
+.patient-age {
+    font-size: 12px;
+    color: #666;
+    margin-left: 4px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    margin: 20px 0;
+}
+
+/* ===== Improved Modal Styling ===== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.modal {
+    background: white;
+    padding: 26px 28px;          /* ⬅ more inner space */
+    border-radius: 14px;
+    width: 340px;                /* ⬅ slightly bigger box */
+    text-align: center;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+}
+
+/* Title */
+.modal h3 {
+    font-size: 18px;
+    color: #0d6efd;
+    margin-bottom: 12px;         /* ⬅ space after title */
+}
+
+/* Message */
+.modal p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 22px;         /* ⬅ space before button */
+    line-height: 1.5;
+}
+
+/* OK button */
+.modal button {
+    width: 100%;
+    padding: 11px;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* Tablet */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+    header h1 {
+        font-size: 20px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    table {
+        font-size: 12px;
+    }
+}

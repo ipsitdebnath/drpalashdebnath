@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointment System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Dr. Palash Debnath</h1>
+    <p>General Physician | Appointment Booking</p>
+</header>
+
+<main class="container">
+
+    <!-- BOOK APPOINTMENT -->
+    <section class="card">
+        <h2>Book an Appointment</h2>
+
+        <form id="appointmentForm">
+            <div class="input-group">
+                <input type="text" id="name" placeholder="Patient Name" required>
+                <input type="number" id="age" placeholder="Age" required>
+            </div>
+
+            <input type="date" id="date" required>
+
+            <!-- Slots appear AFTER date selection -->
+            <div id="slotContainer" class="hidden">
+
+                <label class="slot-label">Select Time Slot</label>
+
+                <div class="slot-section">
+                    <div class="slot-title">Morning</div>
+                    <div id="morningSlots" class="time-slots"></div>
+                </div>
+
+                <div class="slot-section">
+                    <div class="slot-title">Evening</div>
+                    <div id="eveningSlots" class="time-slots"></div>
+                </div>
+
+            </div>
+
+            <input type="hidden" id="time" required>
+
+            <button type="submit">Confirm Appointment</button>
+        </form>
+    </section>
+
+    <!-- SCHEDULED APPOINTMENTS -->
+    <section class="card">
+        <h2>Scheduled Appointments</h2>
+
+        <div class="schedule-wrapper">
+            <table>
+                <thead>
+                    <tr id="dateHeaders"></tr>
+                </thead>
+                <tbody>
+                    <tr id="appointmentRows"></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    © 2026 Dr. Palash Debnath | All Rights Reserved
+</footer>
+
+<!-- Confirmation Modal -->
+<div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+        <h3>Appointment Confirmed</h3>
+        <p>Your appointment has been booked successfully.</p>
+        <button id="modalBtn">OK</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
