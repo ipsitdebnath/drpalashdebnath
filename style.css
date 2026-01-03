@@ -1,265 +1,499 @@
+/* ================= RESET ================= */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* ================= BASE ================= */
 body {
-    font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(120deg, #eef4ff, #f9fbff);
-    color: #222;
-}
-
-/* Header */
-header {
-    background: #0d6efd;
-    color: white;
-    text-align: center;
-    padding: 28px 16px;
-}
-
-header h1 {
-    font-size: 24px;
-}
-
-header p {
-    font-size: 14px;
-    opacity: 0.9;
-}
-
-/* Layout */
-.container {
-    max-width: 1200px;
-    margin: 36px auto;
-    padding: 0 16px;
-    display: grid;
-    grid-template-columns: 1fr 1.6fr;
-    gap: 28px;
-}
-
-/* Card */
-.card {
-    background: white;
-    padding: 22px;
-    border-radius: 16px;
-    box-shadow: 0 10px 26px rgba(0,0,0,0.08);
-}
-
-.card h2 {
-    color: #0d6efd;
-    margin-bottom: 16px;
-    font-size: 20px;
-}
-
-/* Form */
-.input-group {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-input {
-    width: 100%;
-    padding: 11px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    margin-bottom: 12px;
-    font-size: 14px;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background: #0d6efd;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* Slots */
-.slot-label {
-    font-size: 14px;
-    margin-bottom: 6px;
-    display: block;
-}
-
-.slot-section {
-    margin-bottom: 14px;
-}
-
-.slot-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #0d6efd;
-    margin-bottom: 6px;
-}
-
-.time-slots {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.slot {
-    padding: 6px 4px;
-    border-radius: 6px;
-    font-size: 12px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.slot.available {
-    background: #eefaf1;
-    color: #1b7a3a;
-}
-
-.slot.booked {
-    background: #f2f2f2;
-    color: #999;
-    cursor: not-allowed;
-    text-decoration: line-through;
-}
-
-.slot.selected {
-    background: #0d6efd;
-    color: white;
-}
-
-/* Scheduled Appointments */
-.schedule-wrapper {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 8px;
-}
-
-th {
-    background: #f3f6ff;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    text-align: center;
-}
-
-td {
-    vertical-align: top;
-}
-
-/* Appointment card */
-td div {
-    background: #eef3ff;
-    padding: 6px 10px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    font-size: 12.5px;
-    line-height: 1.25;
-}
-
-td div strong {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #1f6fff;
-    margin-bottom: 2px;
-}
-
-.patient-name {
-    font-weight: 500;
-    color: #222;
-}
-
-.patient-age {
-    font-size: 12px;
-    color: #666;
-    margin-left: 4px;
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    font-size: 13px;
-    color: #666;
-    margin: 20px 0;
-}
-
-/* ===== Improved Modal Styling ===== */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-}
-
-.modal {
-    background: white;
-    padding: 26px 28px;          /* ⬅ more inner space */
-    border-radius: 14px;
-    width: 340px;                /* ⬅ slightly bigger box */
-    text-align: center;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.25);
-}
-
-/* Title */
-.modal h3 {
-    font-size: 18px;
-    color: #0d6efd;
-    margin-bottom: 12px;         /* ⬅ space after title */
-}
-
-/* Message */
-.modal p {
-    font-size: 14px;
-    color: #444;
-    margin-bottom: 22px;         /* ⬅ space before button */
-    line-height: 1.5;
-}
-
-/* OK button */
-.modal button {
-    width: 100%;
-    padding: 11px;
-    font-size: 14px;
-    border-radius: 10px;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont;
+  background: linear-gradient(120deg, #eef4ff, #f9fbff);
+  color: #222;
 }
 
 .hidden {
-    display: none;
+  display: none !important;
 }
 
-/* ================= RESPONSIVE ================= */
-
-/* Tablet */
-@media (max-width: 900px) {
-    .container {
-        grid-template-columns: 1fr;
-    }
+/* ================= HEADER ================= */
+header {
+  height: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #eafaf7;
+  background-color: #065f46;
+  text-align: center;
+  padding: 24px 16px;
 }
 
-/* Mobile */
-@media (max-width: 500px) {
-    header h1 {
-        font-size: 20px;
-    }
+header h1 {
+  font-size: 22px;
+  font-weight: 600;
+}
 
-    .card {
-        padding: 18px;
-    }
+header p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+header h1,
+p {
+  margin: 10px 10px 5px 10px;
+}
+.stickyheader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff8ee;
+  color: #7c2d12;
+  border-bottom: 1px solid #fde2c4;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  position: sticky;
+  top: 0px;
+  height: 40px;
+  font-size: 13px;
+}
+/* ================= CONTAINER ================= */
+.container {
+  width: 100%;
+  padding: 16px;
+}
 
-    .time-slots {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* ================= CARD ================= */
+.card {
+  background: white;
+  padding: 22px;
+  border-radius: 18px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
 
-    table {
-        font-size: 12px;
-    }
+.card h2 {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #0d6efd;
+  text-align: center;
+}
+
+/* ================= TOP ROW ================= */
+.top-row {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ================= CLINIC INFO ================= */
+.info-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.doctor-photo {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid #0d6efd;
+  margin-bottom: 18px;
+}
+
+.info-details p {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.info-details strong {
+  color: #111;
+}
+
+/* ================= CONSULTATION HOURS BOX ================= */
+.clinic-hours-box {
+  background: #f1f6ff;
+  padding: 22px 18px;
+  border-radius: 14px;
+  text-align: center;
+  margin: 22px 0;
+}
+
+.clinic-hours-box h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 16px;
+}
+
+.hour-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.hour-item.closed {
+  color: #d63384;
+  font-weight: 600;
+}
+
+/* Address */
+.clinic-address {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #dbe7ff;
+}
+
+.clinic-address strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.clinic-address p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ================= FORM ================= */
+form {
+  margin-top: 10px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #0d6efd;
+}
+
+input[type="date"] {
+  margin-bottom: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* ================= SLOT BUTTONS (FINAL & CORRECT) ================= */
+
+.slot-btn {
+  all: unset;
+  display: block;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+
+  background-color: #e9f8ef;
+  color: #198754;
+
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+#appointmentForm button {
+  margin-top: 10px;
+}
+
+/* Hover */
+.slot-btn:hover {
+  background-color: #d6f3e3;
+}
+
+/* Selected */
+.slot-selected {
+  background-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+/* Booked / Disabled */
+.slot-booked,
+.slot-btn:disabled {
+  background-color: #f1f1f1 !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+}
+/* ================= SLOT GRID LAYOUT ================= */
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* side by side */
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* ================= SCHEDULED APPOINTMENTS ================= */
+.schedule-wrapper {
+  overflow-x: auto;
+}
+.schedule-full {
+  grid-column: 1 / -1;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 14px 0;
+}
+
+th {
+  background: #f2f5ff;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+td {
+  vertical-align: top;
+  padding-top: 14px;
+}
+
+td div {
+  background: #eef3ff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+/* ================= EXTRA INFO & FAQ ================= */
+.extra-info,
+.faq-section {
+  padding: 28px;
+  margin: 28px 16px;
+}
+
+.extra-info h3 {
+  font-size: 16px;
+  margin-top: 22px;
+}
+
+.extra-info h3::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: #e6e9f2;
+  margin-top: 2px;
+}
+.extra-info p {
+  margin-top: 2px;
+}
+.faq-item {
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e6e9f2;
+}
+
+/* ================= MODAL ================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 26px;
+  border-radius: 16px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+}
+.modal h3,
+p {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+/* ================= FOOTER ================= */
+footer {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  margin: 24px 0;
+}
+
+/* ================= DESKTOP UPGRADE ================= */
+@media (min-width: 900px) {
+  .time-slots {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .container {
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .info-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+    gap: 32px;
+  }
+
+  .doctor-photo {
+    width: 200px;
+    height: 200px;
+  }
+
+  .time-slots {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ================= MOBILE HOVER FIX ================= */
+
+/* Prevent mobile sticky hover */
+@media (hover: none) {
+  .slot-btn:hover {
+    background-color: #e9f8ef;
+  }
+}
+@media (hover: none) {
+  .slot.available:hover {
+    background-color: #e9f8ef;
+  }
+}
+/* ================= FINAL DESKTOP COLUMN FIX ================= */
+@media (min-width: 900px) {
+  .top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: stretch;
+  }
+
+  /* Right column: consultation + form stacked */
+  .right-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Equal visual height */
+  .clinic-info,
+  .right-stack {
+    height: 100%;
+  }
+}
+/* ================= DESKTOP: CLINIC INFO – BIGGER & CLEAR ================= */
+@media (min-width: 900px) {
+  /* Center layout (already done, reinforcing) */
+  header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 90px;
+    color: #eafaf7;
+    background-color: #065f46;
+
+    text-align: center;
+    padding: 24px 16px;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin: 20px 0 0 0;
+  }
+
+  header p {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+  }
+  .stickyheader {
+    background: #fff8ee;
+    color: #7c2d12;
+    border-bottom: 1px solid #fde2c4;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    display: flex;
+    height: 10px;
+    position: sticky;
+    top: 0px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .clinic-info .info-layout {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* BIGGER PHOTO */
+  .clinic-info .doctor-photo {
+    width: 260px;
+    height: 260px;
+    border-width: 6px;
+    margin-bottom: 26px;
+  }
+
+  /* WIDER TEXT BLOCK */
+  .clinic-info .info-details {
+    max-width: 620px;
+  }
+
+  /* BIGGER TEXT */
+  .clinic-info .info-details p {
+    font-size: 16.5px;
+    line-height: 1.85;
+    margin-bottom: 10px;
+  }
+
+  /* Emphasize labels */
+  .clinic-info .info-details strong {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  /* Title spacing */
+  .clinic-info h2 {
+    font-size: 22px;
+    margin-bottom: 22px;
+  }
+
+  section.card.clinic-info {
+    height: 743px;
+  }
 }

@@ -1,86 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Appointment System</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dr.Palash Debnath</title>
 
-<header>
-    <h1>Dr. Palash Debnath</h1>
-    <p>General Physician | Appointment Booking</p>
-</header>
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
 
-<main class="container">
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-    <!-- BOOK APPOINTMENT -->
-    <section class="card">
-        <h2>Book an Appointment</h2>
+  <body>
+    <header>
+      <h1
+        style="
+          font-family: Georgia, 'Times New Roman', Times, serif;
+          font-size: 50px;
+        "
+      >
+        Dr. Debnath's Clinic
+      </h1>
+      <p>General Physician</p>
+    </header>
+    <header class="stickyheader">
+      <h2>Now accepting appointments</h2>
+    </header>
 
-        <form id="appointmentForm">
-            <div class="input-group">
-                <input type="text" id="name" placeholder="Patient Name" required>
-                <input type="number" id="age" placeholder="Age" required>
+    <main class="container">
+      <div class="top-row">
+        <!-- ================= LEFT COLUMN ================= -->
+        <!-- CLINIC INFORMATION -->
+        <section class="card clinic-info">
+          <h2>Clinic Information</h2>
+
+          <div class="info-layout">
+            <img src="pfp.png" alt="Doctor Photo" class="doctor-photo" />
+
+            <div class="info-details">
+              <p><strong>Doctor:</strong> Dr. Palash Debnath</p>
+              <p><strong>Speciality:</strong> General Physician</p>
+
+              <p>
+                <strong>Qualifications:</strong><br />
+                M.B.B.S. (Cal), B.M.C.P.<br />
+                Ex. H.P. of S.S.K.M. Hospital (Gen. Med)<br />
+                Ex. M.O. of Calcutta Medical Research Institute (CMRI),
+                Municipality Hospital etc.<br />
+                Ex. M.O. of C.E.S.C.<br />
+                Member of American Diabetic Association (ADA)
+              </p>
             </div>
+          </div>
+        </section>
 
-            <input type="date" id="date" required>
+        <!-- ================= RIGHT COLUMN ================= -->
+        <div class="right-stack">
+          <!-- CONSULTATION HOURS -->
+          <section class="card">
+            <h2>Consultation Hours</h2>
 
-            <!-- Slots appear AFTER date selection -->
-            <div id="slotContainer" class="hidden">
+            <div class="clinic-hours-box">
+              <div class="hour-item">🕙 <span>10:00 AM – 3:00 PM</span></div>
+              <div class="hour-item">🌙 <span>6:00 PM – 10:00 PM</span></div>
+              <div class="hour-item closed">
+                🚫 <span>Saturday: Closed</span>
+              </div>
 
+              <div class="clinic-address">
+                <strong>Clinic Address</strong>
+                <p>
+                  Maheshtala Banerjee Hut,<br />
+                  Near Utpal Dutta Mancha,<br />
+                  Kolkata – 700141
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- BOOK APPOINTMENT -->
+          <section class="card">
+            <h2>Book an Appointment</h2>
+
+            <form id="appointmentForm">
+              <div class="input-group">
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Patient Name"
+                  required
+                />
+                <input id="age" type="number" placeholder="Age" required />
+              </div>
+
+              <input id="date" type="date" required />
+              <input id="time" type="hidden" />
+
+              <div id="slotContainer" class="hidden">
                 <label class="slot-label">Select Time Slot</label>
 
                 <div class="slot-section">
-                    <div class="slot-title">Morning</div>
-                    <div id="morningSlots" class="time-slots"></div>
+                  <div class="slot-title">Morning</div>
+                  <div id="morningSlots" class="time-slots"></div>
                 </div>
 
                 <div class="slot-section">
-                    <div class="slot-title">Evening</div>
-                    <div id="eveningSlots" class="time-slots"></div>
+                  <div class="slot-title">Evening</div>
+                  <div id="eveningSlots" class="time-slots"></div>
                 </div>
+              </div>
 
-            </div>
-
-            <input type="hidden" id="time" required>
-
-            <button type="submit">Confirm Appointment</button>
-        </form>
-    </section>
-
-    <!-- SCHEDULED APPOINTMENTS -->
-    <section class="card">
-        <h2>Scheduled Appointments</h2>
-
-        <div class="schedule-wrapper">
-            <table>
-                <thead>
-                    <tr id="dateHeaders"></tr>
-                </thead>
-                <tbody>
-                    <tr id="appointmentRows"></tr>
-                </tbody>
-            </table>
+              <button type="submit">Confirm Appointment</button>
+            </form>
+          </section>
         </div>
+
+        <!-- ================= FULL WIDTH ================= -->
+        <!-- SCHEDULED APPOINTMENTS -->
+        <section class="card schedule-full">
+          <h2>Scheduled Appointments</h2>
+
+          <div class="schedule-wrapper">
+            <table>
+              <thead>
+                <tr id="dateHeaders"></tr>
+              </thead>
+              <tbody>
+                <tr id="appointmentRows"></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ================= ADDITIONAL INFORMATION ================= -->
+    <section class="card extra-info">
+      <h2>Additional Information</h2>
+
+      <h3>Dr. Palash Debnath in Maheshtala, Kolkata</h3>
+      <p>
+        Dr. Palash Debnath in Maheshtala, Kolkata is a renowned General
+        Physician, operating in two daily sessions: Morning from 10:00 AM – 3:00
+        PM and Evening from 6:00 PM – 10:00 PM. The clinic remains
+        <strong>closed on Saturdays</strong>.
+      </p>
+
+      <h3>Location</h3>
+      <p>
+        The clinic is located near Utpal Dutta Mancha, Maheshtala, Kolkata,
+        easily accessible by public transport with ample parking space.
+      </p>
+
+      <h3>Services Offered</h3>
+      <p>
+        Treatment for viral fever, cold, cough, and other general medical
+        conditions with personalized care.
+      </p>
+
+      <h3>Summary</h3>
+      <p>
+        A trusted healthcare provider delivering patient-centric and
+        comprehensive medical care.
+      </p>
     </section>
 
-</main>
+    <!-- ================= FAQ ================= -->
+    <section class="card faq-section">
+      <h2>Frequently Asked Questions</h2>
 
-<footer>
-    © 2026 Dr. Palash Debnath | All Rights Reserved
-</footer>
+      <div class="faq-item">
+        <h4>What are the consultation hours?</h4>
+        <p>
+          Morning: 10:00 AM – 3:00 PM<br />
+          Evening: 6:00 PM – 10:00 PM<br />
+          Saturday: Closed
+        </p>
+      </div>
 
-<!-- Confirmation Modal -->
-<div id="modalOverlay" class="modal-overlay hidden">
-    <div class="modal">
+      <div class="faq-item">
+        <h4>Where is the clinic located?</h4>
+        <p>Near Utpal Dutta Mancha, Maheshtala, Kolkata.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>Can I consult for cold and fever?</h4>
+        <p>
+          Yes, general medical conditions including cold and fever are treated.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= MODAL ================= -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+      <div class="modal">
         <h3>Appointment Confirmed</h3>
         <p>Your appointment has been booked successfully.</p>
         <button id="modalBtn">OK</button>
+      </div>
     </div>
-</div>
 
-<script src="script.js"></script>
-</body>
+    <footer>© 2026 Dr. Palash Debnath | All Rights Reserved</footer>
+
+    <script src="script.js"></script>
+  </body>
 </html>

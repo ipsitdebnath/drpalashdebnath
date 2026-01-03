@@ -1,3 +1,4 @@
+/* ================= ELEMENTS ================= */
 const form = document.getElementById("appointmentForm");
 const nameInput = document.getElementById("name");
 const ageInput = document.getElementById("age");
@@ -14,23 +15,25 @@ const appointmentRows = document.getElementById("appointmentRows");
 const modalOverlay = document.getElementById("modalOverlay");
 const modalBtn = document.getElementById("modalBtn");
 
-/* ---------- Helpers ---------- */
+/* ================= HELPERS ================= */
 function localDate(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function minsToTime(m) {
-    return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+function minsToTime(mins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-function format12(t) {
-    let [h, m] = t.split(":").map(Number);
+function format12(time) {
+    let [h, m] = time.split(":").map(Number);
     const p = h >= 12 ? "PM" : "AM";
     h = h % 12 || 12;
     return `${h}:${String(m).padStart(2, "0")} ${p}`;
 }
 
-/* ---------- Date Restriction ---------- */
+/* ================= DATE RESTRICTIONS ================= */
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -40,17 +43,17 @@ maxDate.setDate(today.getDate() + 3);
 dateInput.min = localDate(today);
 dateInput.max = localDate(maxDate);
 
-/* ---------- Storage ---------- */
+/* ================= STORAGE ================= */
 let appointments = JSON.parse(localStorage.getItem("appointments")) || [];
 
-/* ---------- Slot Config ---------- */
+/* ================= SLOT CONFIG ================= */
 const SLOT = 20;
 const SESSIONS = [
-    { name: "Morning", start: 600, end: 900 },   // 10 AM – 3 PM
-    { name: "Evening", start: 1080, end: 1320 }  // 6 PM – 10 PM
+    { name: "Morning", start: 600, end: 900 },
+    { name: "Evening", start: 1080, end: 1320 }
 ];
 
-/* ---------- Slot Generator ---------- */
+/* ================= SLOT GENERATION ================= */
 function updateSlots(date) {
     morningSlots.innerHTML = "";
     eveningSlots.innerHTML = "";
@@ -58,11 +61,21 @@ function updateSlots(date) {
 
     if (!date) return;
 
+    const selectedDate = new Date(date);
+    const isSaturday = selectedDate.getDay() === 6;
+
+    if (isSaturday) {
+        slotContainer.classList.remove("hidden");
+        morningSlots.innerHTML = `<p style="color:#999">Clinic Closed</p>`;
+        eveningSlots.innerHTML = `<p style="color:#999">Clinic Closed</p>`;
+        return;
+    }
+
     const now = new Date();
     const isToday = date === localDate(now);
     const nowMin = now.getHours() * 60 + now.getMinutes();
 
-    const booked = appointments
+    const bookedTimes = appointments
         .filter(a => a.date === date)
         .map(a => a.time);
 
@@ -70,68 +83,85 @@ function updateSlots(date) {
         const target = session.name === "Morning" ? morningSlots : eveningSlots;
 
         for (let t = session.start; t + SLOT <= session.end; t += SLOT) {
-            const slot = minsToTime(t);
-            const div = document.createElement("div");
-            div.className = "slot";
-            div.textContent = format12(slot);
+            const slotTime = minsToTime(t);
+            const slot = document.createElement("button");
 
-            if (booked.includes(slot) || (isToday && t < nowMin)) {
-                div.classList.add("booked");
+            slot.type = "button";
+            slot.className = "slot-btn";
+            slot.textContent = format12(slotTime);
+
+            if (bookedTimes.includes(slotTime) || (isToday && t < nowMin)) {
+                slot.disabled = true;
+                slot.classList.add("slot-booked");
             } else {
-                div.classList.add("available");
-                div.onclick = () => {
-                    document.querySelectorAll(".slot").forEach(s => s.classList.remove("selected"));
-                    div.classList.add("selected");
-                    hiddenTime.value = slot;
+                slot.onclick = () => {
+                    document
+                        .querySelectorAll(".slot-btn")
+                        .forEach(b => b.classList.remove("slot-selected"));
+
+                    slot.classList.add("slot-selected");
+                    hiddenTime.value = slotTime;
                 };
             }
 
-            target.appendChild(div);
+            target.appendChild(slot);
         }
     });
 }
 
-/* ---------- Render Appointments ---------- */
+/* ================= RENDER APPOINTMENTS ================= */
 function renderAppointments() {
     dateHeaders.innerHTML = "";
     appointmentRows.innerHTML = "";
 
+    if (appointments.length === 0) return;
+
     const grouped = {};
-    appointments.forEach(a => (grouped[a.date] ||= []).push(a));
+    appointments.forEach(a => {
+        if (!grouped[a.date]) grouped[a.date] = [];
+        grouped[a.date].push(a);
+    });
 
     Object.keys(grouped)
-    .sort((a, b) => new Date(a) - new Date(b))
-    .forEach(date => {
-        const th = document.createElement("th");
-        th.textContent = new Date(date).toDateString();
-        dateHeaders.appendChild(th);
+        .sort((a, b) => new Date(a) - new Date(b))
+        .forEach(date => {
+            const th = document.createElement("th");
+            th.textContent = new Date(date).toDateString();
+            dateHeaders.appendChild(th);
 
-        const td = document.createElement("td");
+            const td = document.createElement("td");
 
-        grouped[date]
-            .sort((a, b) => a.time.localeCompare(b.time)) // time sort (already correct)
-            .forEach(a => {
-                const div = document.createElement("div");
-                div.innerHTML = `
-                    <strong>${format12(a.time)}</strong>
-                    <span class="patient-name">${a.name}</span>
-                    <span class="patient-age">(Age: ${a.age})</span>
-                `;
-                td.appendChild(div);
-            });
+            let serial = 1;
 
-        appointmentRows.appendChild(td);
-    });
+            grouped[date]
+                .sort((a, b) => a.time.localeCompare(b.time))
+                .forEach(a => {
+                    const div = document.createElement("div");
+                    div.className = "appointment-card";
+
+                    div.innerHTML = `
+      <strong>${serial}. ${a.name}</strong> (Age: ${a.age})<br>
+      <span>${format12(a.time)}</span>
+    `;
+
+                    serial++; // increment serial number
+                    td.appendChild(div);
+                });
+
+
+            appointmentRows.appendChild(td);
+        });
 }
 
-/* ---------- Events ---------- */
+/* ================= EVENTS ================= */
 dateInput.addEventListener("change", () => {
-    slotContainer.classList.remove("hidden");  // 👈 SHOW slots
+    slotContainer.classList.remove("hidden");
     updateSlots(dateInput.value);
 });
 
 form.addEventListener("submit", e => {
     e.preventDefault();
+
     if (!hiddenTime.value) {
         alert("Please select a time slot");
         return;
@@ -147,15 +177,19 @@ form.addEventListener("submit", e => {
     localStorage.setItem("appointments", JSON.stringify(appointments));
 
     modalOverlay.classList.remove("hidden");
+
     form.reset();
-    slotContainer.classList.add("hidden"); // 👈 HIDE again
+    hiddenTime.value = "";
+    slotContainer.classList.add("hidden");
     morningSlots.innerHTML = "";
     eveningSlots.innerHTML = "";
 
     renderAppointments();
 });
 
-modalBtn.onclick = () => modalOverlay.classList.add("hidden");
+modalBtn.addEventListener("click", () => {
+    modalOverlay.classList.add("hidden");
+});
 
-/* ---------- Initial Render ---------- */
+/* ================= INIT ================= */
 renderAppointments();
