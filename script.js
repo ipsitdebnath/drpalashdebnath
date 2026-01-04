@@ -1,5 +1,15 @@
 import { supabase } from "./supabase.js";
 
+/* ================= ROLE DETECTION ================= */
+const params = new URLSearchParams(window.location.search);
+
+// Doctor mode via secret URL
+if (params.get("mode") === "doctor") {
+  localStorage.setItem("role", "doctor");
+}
+
+const isDoctor = localStorage.getItem("role") === "doctor";
+
 /* ================= ELEMENTS ================= */
 const form = document.getElementById("appointmentForm");
 const nameInput = document.getElementById("name");
@@ -99,7 +109,7 @@ async function updateSlots(date) {
       const btn = document.createElement("button");
 
       btn.type = "button";
-      btn.className = "slot-btn"; // 🔒 matches CSS
+      btn.className = "slot-btn";
       btn.textContent = format12(slotTime);
 
       if (bookedTimes.includes(slotTime)) {
@@ -129,6 +139,8 @@ async function renderAppointments() {
   const appointments = await fetchAppointments();
   if (!appointments.length) return;
 
+  const patientId = localStorage.getItem("patientAppointmentId");
+
   const grouped = {};
   appointments.forEach(a => {
     if (!grouped[a.date]) grouped[a.date] = [];
@@ -147,13 +159,25 @@ async function renderAppointments() {
       grouped[date]
         .sort((a, b) => a.time.localeCompare(b.time))
         .forEach((a, i) => {
+
+          // Patient: show ONLY their appointment
+          if (!isDoctor && a.id !== patientId) return;
+
           const div = document.createElement("div");
-          div.className = "appointment-card";
-          div.innerHTML = `
-            <strong>${i + 1}. ${a.name}</strong><br>
-            Age: ${a.age}<br>
-            <small>${format12(a.time)}</small>
-          `;
+
+          if (isDoctor) {
+            div.innerHTML = `
+              <strong>${i + 1}. ${a.name}</strong><br>
+              Age: ${a.age}<br>
+              <small>${format12(a.time)}</small>
+            `;
+          } else {
+            div.innerHTML = `
+              <strong>Your Serial Number: ${i + 1}</strong><br>
+              <small>Time: ${format12(a.time)}</small>
+            `;
+          }
+
           td.appendChild(div);
         });
 
@@ -175,15 +199,49 @@ form.addEventListener("submit", async e => {
     return;
   }
 
-  await supabase.from("appointments").insert({
-    name: nameInput.value,
-    age: ageInput.value,
-    date: dateInput.value,
-    time: hiddenTime.value,
-  });
+  // 1️⃣ Insert appointment
+  const { data, error } = await supabase
+    .from("appointments")
+    .insert({
+      name: nameInput.value,
+      age: ageInput.value,
+      date: dateInput.value,
+      time: hiddenTime.value,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    alert("Booking failed. Please try again.");
+    return;
+  }
+
+  // Save patient appointment id
+  localStorage.setItem("patientAppointmentId", data.id);
+
+  // 2️⃣ Fetch all appointments of same date
+  const { data: sameDayAppointments } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("date", data.date)
+    .order("time", { ascending: true });
+
+  // 3️⃣ Calculate serial number
+  const serialNumber =
+    sameDayAppointments.findIndex(a => a.id === data.id) + 1;
+
+  // 4️⃣ Show SUCCESS message with serial
+  modalOverlay.querySelector("h3").textContent = "Appointment Confirmed";
+  modalOverlay.querySelector("p").innerHTML = `
+    <strong>Your booking is successful!</strong><br><br>
+    <strong>Serial Number:</strong> ${serialNumber}<br>
+    <strong>Time:</strong> ${format12(data.time)}<br><br>
+    Please arrive 10 minutes early.
+  `;
 
   modalOverlay.classList.remove("hidden");
 
+  // Reset form
   form.reset();
   hiddenTime.value = "";
   slotContainer.classList.add("hidden");
