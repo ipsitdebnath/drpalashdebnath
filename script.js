@@ -1,13 +1,21 @@
 import { supabase } from "./supabase.js";
 
-/* ================= ROLE DETECTION ================= */
+/* ================= ROLE DETECTION (URL BASED – SAFE) ================= */
 const params = new URLSearchParams(window.location.search);
-if (params.get("mode") === "doctor") {
-  localStorage.setItem("role", "doctor");
-}
-const role = localStorage.getItem("role") || "patient";
+const role = params.get("mode") === "doctor" ? "doctor" : "patient";
 
-/* ================= PATIENT KEY ================= */
+/* ================= DOCTOR VIEW UI CONTROL ================= */
+if (role === "doctor") {
+  document.querySelector(".clinic-info")?.classList.add("hidden");
+  document.querySelector(".right-stack")?.classList.add("hidden");
+  document.querySelector(".extra-info")?.classList.add("hidden");
+  document.querySelector(".faq-section")?.classList.add("hidden");
+  document.querySelector(".stickyheader")?.classList.add("hidden");
+  document.querySelector("footer")?.classList.add("hidden");
+  document.title = "Doctor Dashboard | Dr. Palash Debnath";
+}
+
+/* ================= PATIENT KEY (MULTIPLE BOOKINGS) ================= */
 if (!localStorage.getItem("patientKey")) {
   localStorage.setItem(
     "patientKey",
@@ -104,7 +112,6 @@ async function updateSlots(date) {
 
   const selectedDate = new Date(date);
 
-  // Saturday closed
   if (selectedDate.getDay() === 6) {
     slotContainer.classList.remove("hidden");
     morningSlots.innerHTML = `<p class="closed">Clinic Closed</p>`;
@@ -130,24 +137,18 @@ async function updateSlots(date) {
       btn.className = "slot-btn";
       btn.textContent = format12(slotTime);
 
-      /* 🔴 CANCELLED PAST SLOTS */
       if (isPastSlot(date, slotTime)) {
         btn.classList.add("slot-cancelled");
-        btn.textContent = `${format12(slotTime)}`;
+        btn.textContent += " (Cancelled)";
         btn.disabled = true;
-      }
-      /* 🔴 BOOKED FUTURE SLOTS */
-      else if (bookedTimes.includes(slotTime)) {
+      } else if (bookedTimes.includes(slotTime)) {
         btn.classList.add("slot-booked");
         btn.disabled = true;
-      }
-      /* 🟢 AVAILABLE */
-      else {
+      } else {
         btn.onclick = () => {
           document
             .querySelectorAll(".slot-btn")
             .forEach(b => b.classList.remove("slot-selected"));
-
           btn.classList.add("slot-selected");
           hiddenTime.value = slotTime;
         };
@@ -165,8 +166,6 @@ async function renderAppointments() {
 
   const appointments = await fetchAppointments();
   if (!appointments.length) return;
-
-  const isDoctor = role === "doctor";
 
   const grouped = {};
   appointments.forEach(a => {
@@ -188,7 +187,7 @@ async function renderAppointments() {
         .forEach((a, i) => {
           const div = document.createElement("div");
 
-          if (isDoctor) {
+          if (role === "doctor") {
             div.innerHTML = `
               <strong>${i + 1}. ${a.name}</strong><br>
               Age: ${a.age}<br>
@@ -210,12 +209,12 @@ async function renderAppointments() {
 }
 
 /* ================= EVENTS ================= */
-dateInput.addEventListener("change", () => {
+dateInput?.addEventListener("change", () => {
   slotContainer.classList.remove("hidden");
   updateSlots(dateInput.value);
 });
 
-form.addEventListener("submit", async e => {
+form?.addEventListener("submit", async e => {
   e.preventDefault();
 
   if (!hiddenTime.value) {
@@ -240,9 +239,7 @@ form.addEventListener("submit", async e => {
     return;
   }
 
-  document.querySelector(".modal h3").innerText =
-    "Appointment Confirmed";
-
+  document.querySelector(".modal h3").innerText = "Appointment Confirmed";
   document.querySelector(".modal p").innerHTML = `
     <strong>Your appointment has been booked successfully.</strong><br><br>
     <strong>Time:</strong> ${format12(data.time)}<br><br>
@@ -250,17 +247,12 @@ form.addEventListener("submit", async e => {
   `;
 
   modalOverlay.classList.remove("hidden");
-
   form.reset();
-  hiddenTime.value = "";
   slotContainer.classList.add("hidden");
-  morningSlots.innerHTML = "";
-  eveningSlots.innerHTML = "";
-
   renderAppointments();
 });
 
-modalBtn.addEventListener("click", () => {
+modalBtn?.addEventListener("click", () => {
   modalOverlay.classList.add("hidden");
 });
 
