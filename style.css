@@ -207,6 +207,12 @@ button {
 
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+.slot-booked {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
 #appointmentForm button{
 margin-top: 10px;
 }
