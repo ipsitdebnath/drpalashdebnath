@@ -1,6 +1,6 @@
 import { supabase } from "./supabase.js";
 
-/* ================= ROLE DETECTION (URL BASED – SAFE) ================= */
+/* ================= ROLE DETECTION (URL BASED) ================= */
 const params = new URLSearchParams(window.location.search);
 const role = params.get("mode") === "doctor" ? "doctor" : "patient";
 
@@ -15,10 +15,9 @@ if (role === "doctor") {
   document.title = "Doctor Dashboard | Dr. Palash Debnath";
 }
 
-/* ================= PATIENT KEY (MULTIPLE BOOKINGS) ================= */
+/* ================= PATIENT KEY ================= */
 if (!localStorage.getItem("patientKey")) {
   localStorage.setItem(
-    "patientKey",
     "patient_" + Date.now() + "_" + Math.random().toString(36).slice(2)
   );
 }
@@ -62,11 +61,10 @@ function format12(time) {
 }
 
 function isPastSlot(date, slotTime) {
-  const now = new Date();
   const [h, m] = slotTime.split(":").map(Number);
-  const slotDateTime = new Date(date);
-  slotDateTime.setHours(h, m, 0, 0);
-  return slotDateTime < now;
+  const dt = new Date(date);
+  dt.setHours(h, m, 0, 0);
+  return dt < new Date();
 }
 
 /* ================= DATE LIMIT ================= */
@@ -82,8 +80,8 @@ dateInput.max = localDate(maxDate);
 /* ================= SLOT CONFIG ================= */
 const SLOT = 20;
 const SESSIONS = [
-  { name: "Morning", start: 600, end: 900 },   // 10–3
-  { name: "Evening", start: 1080, end: 1320 }, // 6–10
+  { name: "Morning", start: 600, end: 900 },
+  { name: "Evening", start: 1080, end: 1320 },
 ];
 
 /* ================= FETCH ================= */
@@ -94,13 +92,37 @@ async function fetchAppointments() {
     query = query.eq("patient_key", patientKey);
   }
 
-  const { data, error } = await query;
-  if (error) {
-    console.error(error);
-    return [];
-  }
-  return data;
+  const { data } = await query;
+  return data || [];
 }
+
+/* ================= DELETE APPOINTMENT (HARD DELETE) ================= */
+async function deleteAppointment(id, patientName) {
+  const confirmDelete = confirm(
+    `Are you sure you want to delete the appointment for:\n\n${patientName}?`
+  );
+
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("appointments")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Failed to delete appointment");
+    console.error(error);
+    return;
+  }
+
+  renderAppointments();
+
+  if (dateInput?.value) {
+    updateSlots(dateInput.value); // slot becomes live again
+  }
+}
+
+window.deleteAppointment = deleteAppointment;
 
 /* ================= SLOT GENERATION ================= */
 async function updateSlots(date) {
@@ -109,15 +131,6 @@ async function updateSlots(date) {
   hiddenTime.value = "";
 
   if (!date) return;
-
-  const selectedDate = new Date(date);
-
-  if (selectedDate.getDay() === 6) {
-    slotContainer.classList.remove("hidden");
-    morningSlots.innerHTML = `<p class="closed">Clinic Closed</p>`;
-    eveningSlots.innerHTML = `<p class="closed">Clinic Closed</p>`;
-    return;
-  }
 
   const { data: appointments } = await supabase
     .from("appointments")
@@ -133,22 +146,21 @@ async function updateSlots(date) {
       const slotTime = minsToTime(t);
       const btn = document.createElement("button");
 
-      btn.type = "button";
       btn.className = "slot-btn";
       btn.textContent = format12(slotTime);
 
       if (isPastSlot(date, slotTime)) {
         btn.classList.add("slot-cancelled");
-        btn.textContent += " (Cancelled)";
+        btn.textContent += " (Past)";
         btn.disabled = true;
       } else if (bookedTimes.includes(slotTime)) {
         btn.classList.add("slot-booked");
         btn.disabled = true;
       } else {
         btn.onclick = () => {
-          document
-            .querySelectorAll(".slot-btn")
-            .forEach(b => b.classList.remove("slot-selected"));
+          document.querySelectorAll(".slot-btn").forEach(b =>
+            b.classList.remove("slot-selected")
+          );
           btn.classList.add("slot-selected");
           hiddenTime.value = slotTime;
         };
@@ -174,7 +186,7 @@ async function renderAppointments() {
   });
 
   Object.keys(grouped)
-    .sort((a, b) => new Date(a) - new Date(b))
+    .sort()
     .forEach(date => {
       const th = document.createElement("th");
       th.textContent = new Date(date).toDateString();
@@ -191,7 +203,10 @@ async function renderAppointments() {
             div.innerHTML = `
               <strong>${i + 1}. ${a.name}</strong><br>
               Age: ${a.age}<br>
-              <small>${format12(a.time)}</small>
+              <small>${format12(a.time)}</small><br>
+              <button onclick="deleteAppointment('${a.id}', '${a.name.replace(/'/g, "\\'")}')">
+                ❌ Delete
+              </button>
             `;
           } else {
             div.innerHTML = `
@@ -222,29 +237,18 @@ form?.addEventListener("submit", async e => {
     return;
   }
 
-  const { data, error } = await supabase
-    .from("appointments")
-    .insert({
-      name: nameInput.value,
-      age: ageInput.value,
-      date: dateInput.value,
-      time: hiddenTime.value,
-      patient_key: patientKey,
-    })
-    .select()
-    .single();
+  const { error } = await supabase.from("appointments").insert({
+    name: nameInput.value,
+    age: ageInput.value,
+    date: dateInput.value,
+    time: hiddenTime.value,
+    patient_key: patientKey,
+  });
 
   if (error) {
-    alert("Booking failed. Please try again.");
+    alert("Booking failed");
     return;
   }
-
-  document.querySelector(".modal h3").innerText = "Appointment Confirmed";
-  document.querySelector(".modal p").innerHTML = `
-    <strong>Your appointment has been booked successfully.</strong><br><br>
-    <strong>Time:</strong> ${format12(data.time)}<br><br>
-    Please arrive <strong>10 minutes early</strong>.
-  `;
 
   modalOverlay.classList.remove("hidden");
   form.reset();
