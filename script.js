@@ -133,7 +133,7 @@ async function updateSlots(date) {
       /* 🔴 CANCELLED PAST SLOTS */
       if (isPastSlot(date, slotTime)) {
         btn.classList.add("slot-cancelled");
-        btn.textContent = `${format12(slotTime)} (Cancelled)`;
+        btn.textContent = `${format12(slotTime)}`;
         btn.disabled = true;
       }
       /* 🔴 BOOKED FUTURE SLOTS */
