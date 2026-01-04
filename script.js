@@ -88,41 +88,21 @@ const SESSIONS = [
 /* ===== FETCH ===== */
 async function fetchAppointments() {
   let query = supabase.from("appointments").select("*");
-
-  if (role !== "doctor") {
-    query = query.eq("patient_key", patientKey);
-  }
-
+  if (role !== "doctor") query = query.eq("patient_key", patientKey);
   const { data } = await query;
   return data || [];
 }
 
-/* ===== DELETE APPOINTMENT (PREVIOUS VERSION) ===== */
+/* ===== DELETE APPOINTMENT ===== */
 async function deleteAppointment(id, patientName) {
-  const ok = confirm(
-    `Are you sure you want to delete the appointment for:\n\n${patientName}?`
-  );
+  if (!confirm(`Are you sure you want to delete the appointment for:\n\n${patientName}?`)) return;
 
-  if (!ok) return;
-
-  const { error } = await supabase
-    .from("appointments")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    alert("Failed to delete appointment");
-    console.error(error);
-    return;
-  }
+  const { error } = await supabase.from("appointments").delete().eq("id", id);
+  if (error) return alert("Failed to delete appointment");
 
   renderAppointments();
-
-  if (dateInput?.value) {
-    updateSlots(dateInput.value);
-  }
+  if (dateInput?.value) updateSlots(dateInput.value);
 }
-
 window.deleteAppointment = deleteAppointment;
 
 /* ===== SLOT GENERATION ===== */
@@ -133,12 +113,8 @@ async function updateSlots(date) {
 
   if (!date) return;
 
-  const { data: appointments } = await supabase
-    .from("appointments")
-    .select("*")
-    .eq("date", date);
-
-  const bookedTimes = appointments.map(a => a.time);
+  const { data } = await supabase.from("appointments").select("*").eq("date", date);
+  const bookedTimes = data.map(a => a.time);
 
   SESSIONS.forEach(session => {
     const target = session.name === "Morning" ? morningSlots : eveningSlots;
@@ -147,21 +123,15 @@ async function updateSlots(date) {
       const slotTime = minsToTime(t);
       const btn = document.createElement("button");
 
-      btn.type = "button"; // 🔥 FIX: prevents auto submit
+      btn.type = "button";
       btn.className = "slot-btn";
       btn.textContent = format12(slotTime);
 
-      if (isPastSlot(date, slotTime)) {
-        btn.classList.add("slot-cancelled");
-        btn.disabled = true;
-      } else if (bookedTimes.includes(slotTime)) {
-        btn.classList.add("slot-booked");
+      if (isPastSlot(date, slotTime) || bookedTimes.includes(slotTime)) {
         btn.disabled = true;
       } else {
         btn.onclick = () => {
-          document
-            .querySelectorAll(".slot-btn")
-            .forEach(b => b.classList.remove("slot-selected"));
+          document.querySelectorAll(".slot-btn").forEach(b => b.classList.remove("slot-selected"));
           btn.classList.add("slot-selected");
           hiddenTime.value = slotTime;
         };
@@ -181,47 +151,46 @@ async function renderAppointments() {
   if (!appointments.length) return;
 
   const grouped = {};
-  appointments.forEach(a => {
-    if (!grouped[a.date]) grouped[a.date] = [];
-    grouped[a.date].push(a);
-  });
+  appointments.forEach(a => (grouped[a.date] ??= []).push(a));
 
-  Object.keys(grouped)
-    .sort()
-    .forEach(date => {
-      const th = document.createElement("th");
-      th.textContent = new Date(date).toDateString();
-      dateHeaders.appendChild(th);
+  Object.keys(grouped).sort().forEach(date => {
+    const th = document.createElement("th");
+    th.textContent = new Date(date).toDateString();
+    dateHeaders.appendChild(th);
 
-      const td = document.createElement("td");
+    const td = document.createElement("td");
 
-      grouped[date]
-        .sort((a, b) => a.time.localeCompare(b.time))
-        .forEach((a, i) => {
-          const div = document.createElement("div");
+    grouped[date].sort((a, b) => a.time.localeCompare(b.time)).forEach((a, i) => {
+      const div = document.createElement("div");
 
-          if (role === "doctor") {
-            div.innerHTML = `
-              <strong>${i + 1}. ${a.name}</strong><br>
-              Age: ${a.age}<br>
-              <small>${format12(a.time)}</small><br>
-              <button onclick="deleteAppointment('${a.id}', '${a.name.replace(/'/g, "\\'")}')">
-                ❌ Delete
-              </button>
-            `;
-          } else {
-            div.innerHTML = `
-              <strong>${a.name}</strong><br>
-              Age: ${a.age}<br>
-              <small>${format12(a.time)}</small>
-            `;
-          }
+      if (role === "doctor") {
+        div.innerHTML = `
+          <div class="appt-row">
+            <div class="appt-serial">${i + 1}.</div>
+            <div class="appt-details">
+              <div class="appt-name">${a.name}</div>
+              <div class="appt-age">Age: ${a.age}</div>
+              <div class="appt-time">${format12(a.time)}</div>
+            </div>
+          </div>
+          <button class="delete-btn"
+            onclick="deleteAppointment('${a.id}', '${a.name.replace(/'/g, "\\'")}')">
+            ❌ Delete
+          </button>
+        `;
+      } else {
+        div.innerHTML = `
+          <strong>${a.name}</strong><br>
+          Age: ${a.age}<br>
+          <small>${format12(a.time)}</small>
+        `;
+      }
 
-          td.appendChild(div);
-        });
-
-      appointmentRows.appendChild(td);
+      td.appendChild(div);
     });
+
+    appointmentRows.appendChild(td);
+  });
 }
 
 /* ===== EVENTS ===== */
@@ -232,11 +201,7 @@ dateInput?.addEventListener("change", () => {
 
 form?.addEventListener("submit", async e => {
   e.preventDefault();
-
-  if (!hiddenTime.value) {
-    alert("Please select a time slot");
-    return;
-  }
+  if (!hiddenTime.value) return alert("Please select a time slot");
 
   const { error } = await supabase.from("appointments").insert({
     name: nameInput.value,
@@ -246,10 +211,7 @@ form?.addEventListener("submit", async e => {
     patient_key: patientKey,
   });
 
-  if (error) {
-    alert("Booking failed");
-    return;
-  }
+  if (error) return alert("Booking failed");
 
   modalOverlay.classList.remove("hidden");
   form.reset();
@@ -257,9 +219,7 @@ form?.addEventListener("submit", async e => {
   renderAppointments();
 });
 
-modalBtn?.addEventListener("click", () => {
-  modalOverlay.classList.add("hidden");
-});
+modalBtn?.addEventListener("click", () => modalOverlay.classList.add("hidden"));
 
 /* ===== INIT ===== */
 renderAppointments();

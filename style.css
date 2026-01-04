@@ -46,6 +46,7 @@ header h1 {
   top: 0px;
   height: 40px;
   font-size: 13px;
+  border-top: 0.5px solid black;
 }
 /* ================= CONTAINER ================= */
 .container {
@@ -197,7 +198,8 @@ button {
   width: 100%;
   padding: 8px 6px;
   text-align: center;
-  font-size: 13px;
+  font-size: 18px;
+  font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
   user-select: none;
@@ -274,7 +276,10 @@ margin: 0px;
 .schedule-full {
   grid-column: 1 / -1;
 }
-
+.schedule-full small {
+  font-size: 16px;
+  font-weight: 600;
+}
 table {
   width: 100%;
   border-collapse: separate;
@@ -295,13 +300,14 @@ td {
   padding-top: 14px;
 }
 
-td div {
+td > div {
   background: #eef3ff;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 12px;
   margin-bottom: 12px;
   font-size: 13px;
 }
+
 
 /* ================= EXTRA INFO & FAQ ================= */
 .extra-info,
@@ -329,6 +335,41 @@ td div {
   padding-bottom: 14px;
   margin-bottom: 16px;
   border-bottom: 1px solid #e6e9f2;
+}
+.appt-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.appt-serial {
+  font-weight: 600;
+  min-width: 14px;
+}
+
+.appt-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* 🔥 THIS fixes the big spacing */
+}
+.appt-details div {
+  margin: 0;
+  padding: 0;
+}
+.appt-name {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.appt-age {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.appt-time {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 2px;
 }
 
 /* ================= MODAL ================= */
@@ -467,6 +508,8 @@ footer {
     align-items: center;
     text-align: center;
     font-size: 15px;
+    border-top: 0.5px solid black;
+
   }
 
   .clinic-info .info-layout {
