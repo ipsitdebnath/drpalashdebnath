@@ -212,6 +212,18 @@ button {
   color: #9ca3af;
   cursor: not-allowed;
 }
+.slot-cancelled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.slot-booked {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
 
 #appointmentForm button{
 margin-top: 10px;

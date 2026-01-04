@@ -7,6 +7,15 @@ if (params.get("mode") === "doctor") {
 }
 const role = localStorage.getItem("role") || "patient";
 
+/* ================= PATIENT KEY ================= */
+if (!localStorage.getItem("patientKey")) {
+  localStorage.setItem(
+    "patientKey",
+    "patient_" + Date.now() + "_" + Math.random().toString(36).slice(2)
+  );
+}
+const patientKey = localStorage.getItem("patientKey");
+
 /* ================= ELEMENTS ================= */
 const form = document.getElementById("appointmentForm");
 const nameInput = document.getElementById("name");
@@ -44,15 +53,12 @@ function format12(time) {
   return `${h}:${String(m).padStart(2, "0")} ${p}`;
 }
 
-/* ===== CHECK IF SLOT IS IN THE PAST ===== */
 function isPastSlot(date, slotTime) {
   const now = new Date();
-
   const [h, m] = slotTime.split(":").map(Number);
   const slotDateTime = new Date(date);
   slotDateTime.setHours(h, m, 0, 0);
-
-  return slotDateTime <= now;
+  return slotDateTime < now;
 }
 
 /* ================= DATE LIMIT ================= */
@@ -77,9 +83,7 @@ async function fetchAppointments() {
   let query = supabase.from("appointments").select("*");
 
   if (role !== "doctor") {
-    const patientId = localStorage.getItem("patientAppointmentId");
-    if (!patientId) return [];
-    query = query.eq("id", patientId);
+    query = query.eq("patient_key", patientKey);
   }
 
   const { data, error } = await query;
@@ -103,8 +107,8 @@ async function updateSlots(date) {
   // Saturday closed
   if (selectedDate.getDay() === 6) {
     slotContainer.classList.remove("hidden");
-    morningSlots.innerHTML = `<p style="color:#999">Clinic Closed</p>`;
-    eveningSlots.innerHTML = `<p style="color:#999">Clinic Closed</p>`;
+    morningSlots.innerHTML = `<p class="closed">Clinic Closed</p>`;
+    eveningSlots.innerHTML = `<p class="closed">Clinic Closed</p>`;
     return;
   }
 
@@ -126,14 +130,18 @@ async function updateSlots(date) {
       btn.className = "slot-btn";
       btn.textContent = format12(slotTime);
 
-      if (bookedTimes.includes(slotTime)) {
+      /* 🔴 CANCELLED PAST SLOTS */
+      if (isPastSlot(date, slotTime)) {
+        btn.classList.add("slot-cancelled");
+        btn.textContent = `${format12(slotTime)} (Cancelled)`;
+        btn.disabled = true;
+      }
+      /* 🔴 BOOKED FUTURE SLOTS */
+      else if (bookedTimes.includes(slotTime)) {
         btn.classList.add("slot-booked");
         btn.disabled = true;
-      } 
-      else if (isPastSlot(date, slotTime)) {
-        btn.classList.add("slot-booked"); // greyed out
-        btn.disabled = true;
-      } 
+      }
+      /* 🟢 AVAILABLE */
       else {
         btn.onclick = () => {
           document
@@ -188,8 +196,9 @@ async function renderAppointments() {
             `;
           } else {
             div.innerHTML = `
-              <strong>Appointment Confirmed</strong><br>
-              <small>Time: ${format12(a.time)}</small>
+              <strong>${a.name}</strong><br>
+              Age: ${a.age}<br>
+              <small>${format12(a.time)}</small>
             `;
           }
 
@@ -221,6 +230,7 @@ form.addEventListener("submit", async e => {
       age: ageInput.value,
       date: dateInput.value,
       time: hiddenTime.value,
+      patient_key: patientKey,
     })
     .select()
     .single();
@@ -229,8 +239,6 @@ form.addEventListener("submit", async e => {
     alert("Booking failed. Please try again.");
     return;
   }
-
-  localStorage.setItem("patientAppointmentId", data.id);
 
   document.querySelector(".modal h3").innerText =
     "Appointment Confirmed";
